@@ -1,0 +1,20 @@
+namespace db => sub {
+    require Anego;
+
+    my $anego = Anego->new(
+        connect_info => ['dbi:mysql:database=anego;host=localhost', 'root', ''],
+        schema_class => 'Schema',
+    );
+
+    task build => sub {
+        $anego->build();
+    };
+
+    task diff => sub {
+        $anego->diff($_[1]);
+    };
+
+    task migrate => sub {
+        $anego->migrate($_[1]);
+    };
+};

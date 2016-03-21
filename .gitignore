@@ -29,3 +29,5 @@ cover_db/
 MYMETA.*
 
 /Anego-*
+
+/eg/.db/*.sql
