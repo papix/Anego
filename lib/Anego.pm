@@ -12,6 +12,7 @@ use Module::Load;
 use Path::Tiny;
 use SQL::Translator::Diff;
 use SQL::Translator;
+use Carp qw/ croak /;
 
 has schema_class => (
     is       => 'ro',
@@ -55,6 +56,15 @@ has rdbms => (
     },
 );
 
+has dbh => (
+    is      => 'ro',
+    isa     => 'DBI::db',
+    default => sub {
+        my ($self) = @_;
+        return DBI->connect(@{ $self->connect_info });
+    },
+);
+
 no Mouse;
 
 sub _build_master_schema {
@@ -64,14 +74,21 @@ sub _build_master_schema {
     return $self->_schema_filter($self->schema_class->context->schema);
 }
 
+sub _build_database_schema {
+    my ($self) = @_;
+
+    my $schema = SQL::Translator->new(
+        parser      => 'DBI',
+        parser_args => { dbh => $self->dbh },
+    )->translate;
+    return $self->_schema_filter($schema);
+}
+
 sub build {
     my ($self) = @_;
 
-    my @schema_files = path($self->schema_directory)->children;
-    if (@schema_files) {
-        my $latest_schema_file = nmax_by { s/\.sql$// } @schema_files;
-        my $latest_schema = $self->_build_schema_from_ddl($latest_schema_file->slurp_utf8);
-
+    my $latest_schema = $self->_load_latest_schema;
+    if ($latest_schema) {
         my $diff = $self->_diff($self->master_schema, $latest_schema);
         unless ($diff) {
             print "latest schema == master schema, should no differences.\n";
@@ -85,6 +102,62 @@ sub build {
 
     printf "create new schema: %s\n", $schema_file_name;
     return 1;
+}
+
+sub migrate {
+    my $self = shift;
+    my $version = shift || 'latest';
+
+    my $target_schema = $version eq 'latest' ? $self->_load_latest_schema : $self->_load_schema($version);
+    croak "failed to get schema($version).\n" unless $target_schema;
+
+    my $diff = $self->_diff($self->database_schema, $target_schema);
+    unless ($diff) {
+        print "target schema ($version) == database schema, should no differences.\n";
+        return 0;
+    }
+
+    my @statements = map { "$_;"} grep { /\S+/ } split ';', $diff;
+    for my $statement (@statements) {
+        $self->dbh->do($statement) or croak $self->dbh->errstr;
+    }
+    return 1;
+}
+
+sub diff {
+    my $self = shift;
+    my $version = shift || 'latest';
+
+    my $target_schema = $version eq 'latest' ? $self->_load_latest_schema : $self->_load_schema($version);
+    croak "failed to get schema($version).\n" unless $target_schema;
+
+    my $diff = $self->_diff($self->database_schema, $target_schema);
+    unless ($diff) {
+        print "target schema ($version) == database schema, should no differences.\n";
+        return 0;
+    }
+
+    print "target schema ($version) != database schema\n";
+    return 0;
+}
+
+sub _load_schema {
+    my ($self, $version) = @_;
+
+    my $schema_file = path($self->schema_directory, sprintf('%s.sql', $version));
+    return $schema_file->is_file
+        ? $self->_build_schema_from_ddl($schema_file->slurp_utf8)
+        : undef;
+}
+
+sub _load_latest_schema {
+    my ($self) = @_;
+
+    my @schema_files = path($self->schema_directory)->children;
+    return undef if @schema_files == 0;
+
+    my $latest_schema_file = nmax_by { s/\.sql$// } @schema_files;
+    return $self->_build_schema_from_ddl($latest_schema_file->slurp_utf8);
 }
 
 sub _diff {
@@ -119,6 +192,9 @@ sub _schema_filter {
                 no warnings;
                 splice $table->options, $idx, 1;
             }
+            for my $field ($table->get_fields) {
+                delete $field->{default_value} if $field->{is_nullable} && exists $field->{default_value} && $field->{default_value} eq 'NULL';
+            }
         }
     }
     return $schema;
@@ -131,15 +207,47 @@ __END__
 
 =head1 NAME
 
-Anego - It's new $module
+Anego - The RDBMS migrator as our elder sister.
 
 =head1 SYNOPSIS
 
-    use Anego;
+    package MyApp::Schema {
+        use DBIx::Schema::DSL;
+
+        create_table 'user' => columns {
+            integer 'id', primary_key, auto_increment;
+            varchar 'name';
+        };
+    };
+
+    package main {
+        use Anego;
+
+        my $anego = Anego->new(
+            connect_info => [ ... ],
+            schema_class => 'MyApp::Schema',
+        );
+
+        # create schema file into '.db'
+        $anego->build;
+
+        # display differences between database schema and latest schema
+        $anego->diff;
+
+        # migrate database
+        $anego->migrate;
+    };
+
+    1;
+
+=head1 WARNING
+
+IT'S STILL IN DEVELOPMENT PHASE.
+I have not written document and test script yet.
 
 =head1 DESCRIPTION
 
-Anego is ...
+Anego is RDBMS migrator.
 
 =head1 LICENSE
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "The RDBMS migrator as our elder sister.",
    "author" : [
       "papix <mail@papix.net>"
    ],
@@ -42,6 +42,12 @@
       },
       "runtime" : {
          "requires" : {
+            "DBIx::Schema::DSL" : "0",
+            "List::UtilsBy" : "0",
+            "Module::Load" : "0",
+            "Mouse" : "0",
+            "Path::Tiny" : "0",
+            "SQL::Translator" : "0",
             "perl" : "5.008001"
          }
       },
@@ -52,6 +58,17 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/papix/Anego/issues"
+      },
+      "homepage" : "https://github.com/papix/Anego",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/papix/Anego.git",
+         "web" : "https://github.com/papix/Anego"
+      }
+   },
    "version" : "0.01",
    "x_authority" : "cpan:PAPIX",
    "x_serialization_backend" : "JSON::PP version 2.27203"
