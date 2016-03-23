@@ -1,6 +1,6 @@
 # NAME
 
-Anego - The RDBMS migrator as our elder sister.
+Anego - The database migration utility as our elder sister.
 
 # SYNOPSIS
 
@@ -40,7 +40,7 @@ I have not written document and test script yet.
 
 # DESCRIPTION
 
-Anego is RDBMS migrator.
+Anego is database migration utility.
 
 # LICENSE
 

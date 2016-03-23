@@ -207,7 +207,7 @@ __END__
 
 =head1 NAME
 
-Anego - The RDBMS migrator as our elder sister.
+Anego - The database migration utility as our elder sister.
 
 =head1 SYNOPSIS
 
@@ -247,7 +247,7 @@ I have not written document and test script yet.
 
 =head1 DESCRIPTION
 
-Anego is RDBMS migrator.
+Anego is database migration utility.
 
 =head1 LICENSE
 

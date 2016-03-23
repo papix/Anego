@@ -1,5 +1,5 @@
 {
-   "abstract" : "The RDBMS migrator as our elder sister.",
+   "abstract" : "The database migration utility as our elder sister.",
    "author" : [
       "papix <mail@papix.net>"
    ],
