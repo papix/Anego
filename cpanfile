@@ -1,5 +1,5 @@
 requires 'DBIx::Schema::DSL';
-requires 'List::UtilsBy';
+requires 'Git::Repository';
 requires 'Module::Load';
 requires 'Mouse';
 requires 'Path::Tiny';
