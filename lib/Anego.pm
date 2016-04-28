@@ -156,7 +156,7 @@ sub _load_latest_schema {
     my @schema_files = path($self->schema_directory)->children;
     return undef if @schema_files == 0;
 
-    my $latest_schema_file = nmax_by { s/\.sql$// } @schema_files;
+    my $latest_schema_file = nmax_by { $_ = $_->basename; s/\.sql$// ; $_ } @schema_files;
     return $self->_build_schema_from_ddl($latest_schema_file->slurp_utf8);
 }
 
