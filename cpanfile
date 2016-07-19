@@ -1,9 +1,14 @@
+requires 'DBI';
 requires 'DBIx::Schema::DSL';
+requires 'Digest::MD5';
+requires 'Exporter';
+requires 'File::Spec';
+requires 'Getopt::Long';
 requires 'Git::Repository';
 requires 'Module::Load';
-requires 'Mouse';
-requires 'Path::Tiny';
 requires 'SQL::Translator';
+requires 'Term::ANSIColor';
+requires 'Try::Tiny';
 requires 'perl', '5.008001';
 
 on 'test' => sub {
