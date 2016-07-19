@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/papix/Anego.svg?branch=master)](https://travis-ci.org/papix/Anego)
 # NAME
 
 Anego - The database migration utility as our elder sister.
