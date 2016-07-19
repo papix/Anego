@@ -62,10 +62,9 @@ sub _filter {
 
     if ($config->rdbms eq 'MySQL') {
         for my $table ($schema->get_tables) {
-            my @options = $table->options;
-            if (my ($idx) = grep { $options[$_]->{AUTO_INCREMENT} } 0..$#options) {
-                no warnings;
-                splice $table->options, $idx, 1;
+            my $options = $table->options;
+            if (my ($idx) = grep { $options->[$_]->{AUTO_INCREMENT} } 0..$#{$options}) {
+                splice @{ $options }, $idx, 1;
             }
             for my $field ($table->get_fields) {
                 delete $field->{default_value} if $field->{is_nullable} && exists $field->{default_value} && $field->{default_value} eq 'NULL';
