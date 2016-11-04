@@ -1,4 +1,4 @@
-package Anego::CLI::Migrate;
+package Anego::CLI::Diff;
 use strict;
 use warnings;
 use utf8;
@@ -22,9 +22,7 @@ sub run {
         return;
     }
 
-    do_sql($diff);
-
-    infof "Migrated\n";
+    print $diff;
 }
 
 1;
