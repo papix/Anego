@@ -9,7 +9,19 @@ use SQL::Translator;
 use Anego::Config;
 use Anego::Git;
 
-sub git {
+sub target {
+    my $class  = shift;
+    my $method = shift || 'latest';
+    my @args   = @_;
+
+    unless ($class->can($method)) {
+        errorf("Could not find subcommand: %s\n", $method);
+    }
+
+    return $class->$method(@args);
+}
+
+sub revision {
     my ($class, $revision) = @_;
     my $config = Anego::Config->load;
 
@@ -31,7 +43,7 @@ __SRC__
     return _filter($schema);
 }
 
-sub master {
+sub latest {
     my ($class) = @_;
     my $config = Anego::Config->load;
 
