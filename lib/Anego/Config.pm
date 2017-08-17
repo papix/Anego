@@ -10,7 +10,7 @@ use Anego::Logger;
 our $CONFIG_PATH;
 our $CONFIG;
 
-sub config_path { $CONFIG_PATH || '.anego.pl' }
+sub config_path { $CONFIG_PATH || './.anego.pl' }
 
 sub load {
     my ($class) = @_;
@@ -32,7 +32,7 @@ sub connect_info { $_[0]->{connect_info} }
 sub database {
     my ($self) = @_;
     unless ($self->{database}) {
-        $self->{database} = do { my ($d) = $self->connect_info->[0] =~ /database=(\w+)/; $d };
+        $self->{database} = do { my (undef, $d) = $self->connect_info->[0] =~ /(database|dbname|name|db)=(\w+)/; $d };
     }
     return $self->{database};
 }
