@@ -2,6 +2,9 @@ Revision history for Perl extension Anego
 
 {{$NEXT}}
 
+    - fix some bugs
+    - new feature: "help" command
+
 0.01_02 2016-11-04T03:56:54Z
 
     - new feature: "diff" command
