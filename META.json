@@ -74,7 +74,7 @@
          "web" : "https://github.com/papix/Anego"
       }
    },
-   "version" : "0.01_02",
+   "version" : "0.01_03",
    "x_authority" : "cpan:PAPIX",
    "x_contributors" : [
       "dokechin <ttatsumi@ra2.so-net.ne.jp>",
