@@ -9,13 +9,13 @@ use SQL::Translator;
 use Anego::Config;
 use Anego::Git;
 
-sub target {
+sub from {
     my $class  = shift;
-    my $method = shift || 'latest';
+    my $method = lc(shift || 'latest');
     my @args   = @_;
 
     unless ($class->can($method)) {
-        errorf("Could not find subcommand: %s\n", $method);
+        errorf("Could not use method: %s\n", $method);
     }
 
     return $class->$method(@args);

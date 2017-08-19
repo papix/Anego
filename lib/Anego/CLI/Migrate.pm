@@ -14,7 +14,7 @@ sub run {
     my $config = Anego::Config->load;
 
     my $source_schema = Anego::Task::SchemaLoader->database;
-    my $target_schema = Anego::Task::SchemaLoader->target(@args);
+    my $target_schema = Anego::Task::SchemaLoader->from(@args);
 
     my $diff = Anego::Task::Diff->diff($source_schema, $target_schema);
     unless ($diff) {
