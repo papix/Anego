@@ -5,7 +5,6 @@ requires 'Exporter';
 requires 'File::Spec';
 requires 'Getopt::Long';
 requires 'Git::Repository';
-requires 'Module::Load';
 requires 'SQL::Translator';
 requires 'Term::ANSIColor';
 requires 'Try::Tiny';

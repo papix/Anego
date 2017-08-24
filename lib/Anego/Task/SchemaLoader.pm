@@ -3,11 +3,11 @@ use strict;
 use warnings;
 use utf8;
 use Digest::MD5 qw/ md5_hex /;
-use Module::Load;
 use SQL::Translator;
 
 use Anego::Config;
 use Anego::Git;
+use Anego::Logger;
 
 sub from {
     my $class  = shift;
@@ -27,18 +27,12 @@ sub revision {
 
     my $schema_class = $config->schema_class;
     my $schema_str   = git_cat_file(sprintf('%s:%s', $revision, $config->schema_path));
-    $schema_str =~ s/package\s+$schema_class;?//;
 
-    my $klass = sprintf('Anego::__ANON__::%s::%s', $revision, md5_hex(int rand 65535));
-    eval sprintf <<'__SRC__', $klass, $schema_str;
-package %s {
-    %s
-}
-__SRC__
+    my $ddl = $class->_load_ddl_from_schema_string($schema_class, $schema_str);
 
     my $schema = SQL::Translator->new(
         parser => $config->rdbms,
-        data   => \$klass->output,
+        data   => \$ddl,
     )->translate;
     return _filter($schema);
 }
@@ -48,11 +42,19 @@ sub latest {
     my $config = Anego::Config->load;
 
     my $schema_class = $config->schema_class;
-    Module::Load::load $schema_class;
+    my $schema_path  = $config->schema_path;
+
+    errorf("Could not find schema class file: $schema_path") unless -f $schema_path;
+
+    open my $fh, '<', $schema_path or errorf("Failed to open: $!");
+    my $schema_str = do { local $/; <$fh> };
+    close $fh;
+
+    my $ddl = $class->_load_ddl_from_schema_string($schema_class, $schema_str);
 
     my $schema = SQL::Translator->new(
         parser => $config->rdbms,
-        data   => \$schema_class->output,
+        data   => \$ddl,
     )->translate;
     return _filter($schema);
 }
@@ -67,6 +69,22 @@ sub database {
     )->translate;
     return _filter($schema);
 }
+
+sub _load_ddl_from_schema_string {
+    my ($class, $schema_class, $schema_str) = @_;
+
+    $schema_str =~ s/package\s+$schema_class;?//;
+
+    my $klass = sprintf('Anego::Task::SchemaLoader::__ANON__::%s', md5_hex(int rand 65535));
+    eval sprintf <<'__SRC__', $klass, $schema_str;
+package %s {
+    %s
+}
+__SRC__
+
+    return $klass->output;
+}
+
 
 sub _filter {
     my ($schema) = @_;
