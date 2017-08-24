@@ -24,7 +24,9 @@ sub _print {
     my ($type, $string, @args) = @_;
 
     my $message = sprintf($string, (map { defined($_) ? $_ : '-' } @args));
-    my $colored_message = colored $message, $COLORS->{$type};
+    my $colored_message = defined $COLORS->{$type}
+        ? colored $message, $COLORS->{$type}
+        : $message;
 
     my $fh = $type && $type <= INFO ? *STDOUT : *STDERR;
     print {$fh} $colored_message;

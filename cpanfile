@@ -16,5 +16,4 @@ on 'test' => sub {
     requires 'Test::Requires::Git';
 
     requires 'Capture::Tiny';
-    requires 'Path::Tiny';
 };
