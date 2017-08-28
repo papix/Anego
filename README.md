@@ -8,18 +8,26 @@ Anego - The database migration utility as our elder sister.
     # show status
     $ anego status
 
-    # migration
+    RDBMS:        MySQL
+    Database:     myapp
+    Schema class: MyApp::DB::Schema (lib/MyApp/DB/Schema.pm)
+
+    Hash     Commit message
+    --------------------------------------------------
+    e299e9f  commit
+    1fdc91a  initial commit
+
+    # migrate to latest schema
     $ anego migrate
-    $ anego migrate revision 1fdc91
 
-    # diff
+    # migrate to schema of specified revision
+    $ anego migrate revision 1fdc91a
+
+    # show difference between current database schema and latest schema
     $ anego diff
-    $ anego diff revision 1fdc91
 
-# WARNING
-
-IT'S STILL IN DEVELOPMENT PHASE.
-I have not written document and test script yet.
+    # show difference between current database schema and schema of specified revision
+    $ anego diff revision 1fdc91a
 
 # DESCRIPTION
 
@@ -27,15 +35,20 @@ Anego is database migration utility.
 
 # CONFIGURATION
 
+Anego requires configuration file.
+In default, Anego uses `.anego.pl` as configuration file.
+
     # .anego.pl
     +{
-        "connect_info" => ["dbi:mysql:database=myapp;host=localhost", "root"],
-        "schema_class" => "MyApp::DB::Schema",
+        connect_info => ['dbi:mysql:database=myapp;host=localhost', 'root'],
+        schema_class => 'MyApp::DB::Schema',
     }
+
+If you want to use other files for configuration, you can use `-c` option: `anego status -c ./config.pl`
 
 # SCHEMA CLASS
 
-You can declare of the schema using [DBIx::Schema::DSL](https://metacpan.org/pod/DBIx::Schema::DSL):
+To define database schema, Anego uses [DBIx::Schema::DSL](https://metacpan.org/pod/DBIx::Schema::DSL):
 
     package MyApp::DB::Schema;
     use strict;
@@ -57,6 +70,8 @@ You can declare of the schema using [DBIx::Schema::DSL](https://metacpan.org/pod
 
         belongs_to 'author';
     };
+
+    1;
 
 # LICENSE
 

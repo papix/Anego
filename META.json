@@ -49,7 +49,6 @@
             "File::Spec" : "0",
             "Getopt::Long" : "0",
             "Git::Repository" : "0",
-            "Module::Load" : "0",
             "SQL::Translator" : "0",
             "Term::ANSIColor" : "0",
             "Try::Tiny" : "0",
@@ -58,7 +57,10 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Capture::Tiny" : "0",
+            "Test::Git" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires::Git" : "0"
          }
       }
    },
@@ -74,7 +76,7 @@
          "web" : "https://github.com/papix/Anego"
       }
    },
-   "version" : "0.01_03",
+   "version" : "0.02",
    "x_authority" : "cpan:PAPIX",
    "x_contributors" : [
       "dokechin <ttatsumi@ra2.so-net.ne.jp>",

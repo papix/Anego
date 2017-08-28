@@ -2,6 +2,9 @@ Revision history for Perl extension Anego
 
 {{$NEXT}}
 
+    - add test
+    - update document
+
 0.01_03 2017-08-19T05:41:24Z
 
     - fix some bugs

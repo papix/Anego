@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "0.01_03";
+our $VERSION = "0.02";
 
 1;
 
@@ -21,18 +21,26 @@ Anego - The database migration utility as our elder sister.
     # show status
     $ anego status
 
-    # migration
+    RDBMS:        MySQL
+    Database:     myapp
+    Schema class: MyApp::DB::Schema (lib/MyApp/DB/Schema.pm)
+
+    Hash     Commit message
+    --------------------------------------------------
+    e299e9f  commit
+    1fdc91a  initial commit
+
+    # migrate to latest schema
     $ anego migrate
-    $ anego migrate revision 1fdc91
 
-    # diff
+    # migrate to schema of specified revision
+    $ anego migrate revision 1fdc91a
+
+    # show difference between current database schema and latest schema
     $ anego diff
-    $ anego diff revision 1fdc91
 
-=head1 WARNING
-
-IT'S STILL IN DEVELOPMENT PHASE.
-I have not written document and test script yet.
+    # show difference between current database schema and schema of specified revision
+    $ anego diff revision 1fdc91a
 
 =head1 DESCRIPTION
 
@@ -40,15 +48,20 @@ Anego is database migration utility.
 
 =head1 CONFIGURATION
 
+Anego requires configuration file.
+In default, Anego uses C<.anego.pl> as configuration file.
+
     # .anego.pl
     +{
-        "connect_info" => ["dbi:mysql:database=myapp;host=localhost", "root"],
-        "schema_class" => "MyApp::DB::Schema",
+        connect_info => ['dbi:mysql:database=myapp;host=localhost', 'root'],
+        schema_class => 'MyApp::DB::Schema',
     }
+
+If you want to use other files for configuration, you can use C<-c> option: C<anego status -c ./config.pl>
 
 =head1 SCHEMA CLASS
 
-You can declare of the schema using L<DBIx::Schema::DSL>:
+To define database schema, Anego uses L<DBIx::Schema::DSL>:
 
     package MyApp::DB::Schema;
     use strict;
@@ -70,6 +83,8 @@ You can declare of the schema using L<DBIx::Schema::DSL>:
 
         belongs_to 'author';
     };
+
+    1;
 
 =head1 LICENSE
 
