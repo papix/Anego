@@ -32,7 +32,7 @@ sub connect_info { $_[0]->{connect_info} }
 sub database {
     my ($self) = @_;
     unless ($self->{database}) {
-        $self->{database} = do { my (undef, $d) = $self->connect_info->[0] =~ /(database|dbname|name|db)=(\w+)/; $d };
+        $self->{database} = do { my (undef, $d) = $self->connect_info->[0] =~ /(database|dbname|name|db)=([\w:]+)/; $d };
     }
     return $self->{database};
 }

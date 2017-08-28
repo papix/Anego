@@ -28,13 +28,14 @@ sub revision {
     my $schema_class = $config->schema_class;
     my $schema_str   = git_cat_file(sprintf('%s:%s', $revision, $config->schema_path));
 
-    my $ddl = $class->_load_ddl_from_schema_string($schema_class, $schema_str);
+    my $ddl = _load_ddl_from_schema_string($schema_class, $schema_str);
 
-    my $schema = SQL::Translator->new(
+    my $tr = SQL::Translator->new(
         parser => $config->rdbms,
         data   => \$ddl,
-    )->translate;
-    return _filter($schema);
+    );
+    $tr->translate;
+    return _filter($tr);
 }
 
 sub latest {
@@ -50,36 +51,38 @@ sub latest {
     my $schema_str = do { local $/; <$fh> };
     close $fh;
 
-    my $ddl = $class->_load_ddl_from_schema_string($schema_class, $schema_str);
+    my $ddl = _load_ddl_from_schema_string($schema_class, $schema_str);
 
-    my $schema = SQL::Translator->new(
+    my $tr = SQL::Translator->new(
         parser => $config->rdbms,
         data   => \$ddl,
-    )->translate;
-    return _filter($schema);
+    );
+    $tr->translate;
+    return _filter($tr);
 }
 
 sub database {
     my ($class) = @_;
     my $config = Anego::Config->load;
 
-    my $schema = SQL::Translator->new(
+    my $tr = SQL::Translator->new(
         parser      => 'DBI',
         parser_args => { dbh => $config->dbh },
-    )->translate;
-    return _filter($schema);
+    );
+    $tr->translate;
+    return _filter($tr);
 }
 
 sub _load_ddl_from_schema_string {
-    my ($class, $schema_class, $schema_str) = @_;
+    my ($schema_class, $schema_str) = @_;
 
     $schema_str =~ s/package\s+$schema_class;?//;
 
     my $klass = sprintf('Anego::Task::SchemaLoader::__ANON__::%s', md5_hex(int rand 65535));
     eval sprintf <<'__SRC__', $klass, $schema_str;
-package %s {
-    %s
-}
+package %s;
+
+%s
 __SRC__
 
     return $klass->output;
@@ -87,11 +90,12 @@ __SRC__
 
 
 sub _filter {
-    my ($schema) = @_;
-    my $config = Anego::Config->load;
+    my ($tr) = @_;
+    return $tr unless $tr;
 
+    my $config = Anego::Config->load;
     if ($config->rdbms eq 'MySQL') {
-        for my $table ($schema->get_tables) {
+        for my $table ($tr->schema->get_tables) {
             my $options = $table->options;
             if (my ($idx) = grep { $options->[$_]->{AUTO_INCREMENT} } 0..$#{$options}) {
                 splice @{ $options }, $idx, 1;
@@ -101,7 +105,7 @@ sub _filter {
             }
         }
     }
-    return $schema;
+    return $tr;
 }
 
 1;

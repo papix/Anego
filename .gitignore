@@ -29,3 +29,5 @@ cover_db/
 MYMETA.*
 
 /Anego-*
+
+/.test.requires.git.lock
