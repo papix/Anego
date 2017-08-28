@@ -80,9 +80,9 @@ sub _load_ddl_from_schema_string {
 
     my $klass = sprintf('Anego::Task::SchemaLoader::__ANON__::%s', md5_hex(int rand 65535));
     eval sprintf <<'__SRC__', $klass, $schema_str;
-package %s {
-    %s
-}
+package %s;
+
+%s
 __SRC__
 
     return $klass->output;
