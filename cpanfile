@@ -1,3 +1,4 @@
+requires 'Module::Load';
 requires 'DBI';
 requires 'DBIx::Schema::DSL';
 requires 'Digest::MD5';
